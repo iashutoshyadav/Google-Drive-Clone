@@ -109,9 +109,8 @@ export default function FileCard({ file, onDelete, onMove, onShare, onRestore })
               <button
                 className="p-2 border rounded-full hover:bg-red-50 flex items-center justify-center"
                 onClick={() => {
-                  if (confirm(`Delete file "${file.name}"?`)) {
                     onDelete(file);
-                  }
+                  
                 }}
               >
                 <Trash2 size={16} />

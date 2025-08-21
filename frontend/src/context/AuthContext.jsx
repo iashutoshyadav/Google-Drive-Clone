@@ -40,9 +40,9 @@ export function AuthProvider({ children }) {
       localStorage.setItem("token", res.token);
       setToken(res.token);
       setUser(res.user);
-      return { ok: true };
+      return res.user;
     }
-    return { ok: false, message: res?.message || "Login failed" };
+    throw new Error(res?.message || "Invalid credentials");
   }
 
   // ---- Signup ----
@@ -52,9 +52,9 @@ export function AuthProvider({ children }) {
       localStorage.setItem("token", res.token);
       setToken(res.token);
       setUser(res.user);
-      return { ok: true };
+      return res.user;
     }
-    return { ok: false, message: res?.message || "Signup failed" };
+    throw new Error(res?.message || "Signup failed");
   }
 
   // ---- Logout ----
