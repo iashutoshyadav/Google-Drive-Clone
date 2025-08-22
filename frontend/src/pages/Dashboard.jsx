@@ -14,6 +14,7 @@ import {
   listFolder,
   createFolder,
   renameFolder,
+  deleteFolder,
 } from "../services/folderService.js";
 import {
   uploadFile,
@@ -106,7 +107,11 @@ export default function Dashboard() {
   async function handleConfirmDelete() {
     if (!confirmDelete) return;
     const { type, item } = confirmDelete;
-    await removeFile(token, item.id, type);
+     if (type === "file") {
+    await removeFile(token, item.id, "file");
+  } else if (type === "folder") {
+    await deleteFolder(token, item.id);
+  }
     setConfirmDelete(null);
     load();
   }
