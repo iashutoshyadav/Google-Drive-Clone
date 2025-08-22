@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
 import Sidebar from "../components/Sidebar.jsx";
 import Breadcrumbs from "../components/Breadcrumbs.jsx";
 import FileCard from "../components/FileCard.jsx";
 import FolderCard from "../components/FolderCard.jsx";
 import UploadModal from "../features/UploadModal.jsx";
-import FilePreview from "../features/FilePreview.jsx";
 import ShareModal from "../features/ShareModal.jsx";
 import CreateFolderModal from "../features/CreateFolderModal.jsx";
 import DeleteConfirmModal from "../features/DeleteConfirmModal.jsx";
@@ -25,6 +25,7 @@ import { createShare } from "../services/shareService.js";
 
 export default function Dashboard() {
   const { token } = useAuth();
+  const navigate = useNavigate(); 
   const [breadcrumbs, setBreadcrumbs] = useState([{ id: null, name: "My Drive" }]);
   const [folderId, setFolderId] = useState(null);
   const [folders, setFolders] = useState([]);
@@ -84,9 +85,20 @@ export default function Dashboard() {
 
   //open file preview
   async function handleOpenFile(file) {
+  try {
     const res = await downloadFile(token, file.id);
-    if (res?.url) setPreview({ ...file, url: res.url });
+    const directUrl = res?.url || file?.url;
+    if (!directUrl) {
+      alert("Unable to open file.");
+      return;
+    }
+    window.open(directUrl, "_blank", "noopener,noreferrer");
+  } catch (e) {
+    console.error(e);
+    alert("Failed to open file.");
   }
+}
+
 
   // Delete handlers
   function handleDeleteFile(file) { setConfirmDelete({ type: "file", item: file }); }
@@ -149,7 +161,7 @@ export default function Dashboard() {
           {filtered.folders.length > 0 && <>
             <div className="mt-6 text-sm font-semibold text-gray-700">Folders</div>
             <div className="mt-2 grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-4">
-              {filtered.folders.map(f => <FolderCard key={f.id} folder={f} onOpen={() => pushCrumb(f.id, f.name)} onRename={async fold => {
+              {filtered.folders.map(f => <FolderCard key={f.id} folder={f} onOpen={() => navigate("/shared")} onRename={async fold => {
                 const name = prompt("Rename folder to:", fold.name);
                 if (!name) return;
                 await renameFolder(token, fold.id, name);
@@ -168,7 +180,6 @@ export default function Dashboard() {
 
       <UploadModal open={uploadOpen} onClose={() => setUploadOpen(false)} onUpload={handleUpload} />
       <CreateFolderModal open={newFolderOpen} onClose={() => setNewFolderOpen(false)} onCreate={handleCreateFolder} />
-      <FilePreview file={preview} onClose={() => setPreview(null)} />
       <DeleteConfirmModal open={!!confirmDelete} onClose={() => setConfirmDelete(null)} onConfirm={handleConfirmDelete} label={confirmDelete?.type === "file" ? `Delete ${confirmDelete.item.name}?` : "Delete this folder?"} />
       <ShareModal file={shareFile} onClose={() => setShareFile(null)} onShare={handleShare} />
     </div>

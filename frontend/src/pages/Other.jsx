@@ -36,16 +36,7 @@ export default function About() {
           </div>
 
           {/* Tech Stack */}
-          <div className="bg-white p-6 rounded-xl shadow-md">
-            <h2 className="text-xl font-semibold mb-2">Tech Stack</h2>
-            <ul className="list-disc list-inside text-gray-700 space-y-1">
-              <li>Frontend: React + Tailwind CSS</li>
-              <li>Backend: Node.js + Express</li>
-              <li>Database & Storage: Supabase</li>
-              <li>Authentication: JWT & Supabase Auth</li>
-              <li>Icons: Lucide React</li>
-            </ul>
-          </div>
+
 
           {/* Author */}
           <div className="bg-white p-6 rounded-xl shadow-md">

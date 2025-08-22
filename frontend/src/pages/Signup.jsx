@@ -4,17 +4,23 @@ import { useAuth } from "../hooks/useAuth.js";
 
 export default function Signup() {
   const { signup } = useAuth();
-  const nav = useNavigate();
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function onSubmit(e) {
     e.preventDefault();
+    setErr("");
+    setLoading(true);
     try {
-      await signup(form);
-      nav("/dashboard");
+      await signup(form);               // must resolve or throw
+      navigate("/login", { replace: true });
     } catch (error) {
-      setErr(error.message);
+      setErr(error?.message || "Failed to sign up. Please try again.");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -22,9 +28,9 @@ export default function Signup() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-100 via-white to-violet-100 p-6">
       <form
         onSubmit={onSubmit}
+        noValidate
         className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-md border border-gray-200"
       >
-        {/* Website Name / Logo */}
         <h1 className="text-4xl font-extrabold text-teal-600 text-center tracking-wide">
           Storify
         </h1>
@@ -41,10 +47,13 @@ export default function Signup() {
         <div className="mt-6">
           <label className="block text-sm font-medium text-gray-700">Name</label>
           <input
+            type="text"
+            required
+            autoComplete="name"
             className="w-full mt-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-teal-400"
             placeholder="Enter your name"
             value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            onChange={(e) => setForm((s) => ({ ...s, name: e.target.value }))}
           />
         </div>
 
@@ -52,10 +61,12 @@ export default function Signup() {
           <label className="block text-sm font-medium text-gray-700">Email</label>
           <input
             type="email"
+            required
+            autoComplete="email"
             className="w-full mt-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-teal-400"
             placeholder="Enter your email"
             value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            onChange={(e) => setForm((s) => ({ ...s, email: e.target.value }))}
           />
         </div>
 
@@ -63,26 +74,27 @@ export default function Signup() {
           <label className="block text-sm font-medium text-gray-700">Password</label>
           <input
             type="password"
+            required
+            autoComplete="new-password"
             className="w-full mt-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-teal-400"
             placeholder="Enter your password"
             value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            onChange={(e) => setForm((s) => ({ ...s, password: e.target.value }))}
           />
         </div>
 
         <button
           type="submit"
-          className="w-full mt-6 py-2 rounded-lg font-semibold text-lg bg-gradient-to-r from-teal-500 to-violet-500 text-white shadow-md hover:opacity-90 transition"
+          disabled={loading}
+          className={`w-full mt-6 py-2 rounded-lg font-semibold text-lg text-white shadow-md transition
+            ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-gradient-to-r from-teal-500 to-violet-500 hover:opacity-90"}`}
         >
-          Sign Up
+          {loading ? "Creating..." : "Sign Up"}
         </button>
 
         <p className="text-center text-sm text-gray-600 mt-5">
           Already have an account?{" "}
-          <Link
-            to="/login"
-            className="text-teal-600 hover:text-violet-500 font-medium transition"
-          >
+          <Link to="/login" className="text-teal-600 hover:text-violet-500 font-medium transition">
             Log in
           </Link>
         </p>

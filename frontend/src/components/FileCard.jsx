@@ -28,13 +28,24 @@ function Tooltip({ text, children }) {
   );
 }
 
-export default function FileCard({ file, onDelete, onMove, onShare, onRestore }) {
+export default function FileCard({ file,onOpen, onDelete, onMove, onShare, onRestore }) {
   const [showShare, setShowShare] = useState(false);
 
-  const handleOpen = async () => {
-  
-    if (!file.url) return;
-    window.open(file.url, "_blank");
+   const handleOpen = () => {
+    if (typeof onOpen === "function") {
+      onOpen(file);
+      return;
+    }
+    if (!file?.url) return;
+    const backendOrigin =
+      import.meta.env.VITE_FILE_BASE_URL ||
+      import.meta.env.VITE_API_URL ||
+      "";
+    const isAbsolute = /^https?:\/\//i.test(file.url);
+    const finalUrl = isAbsolute
+      ? file.url
+      : `${backendOrigin}${file.url.startsWith("/") ? "" : "/"}${file.url}`;
+    window.open(finalUrl, "_blank", "noopener,noreferrer");
   };
 
   const ext = file.mime?.split("/")?.[1]?.toLowerCase() || file.extension?.toLowerCase() || "file";

@@ -7,6 +7,11 @@ export const createShare = (token, payload) =>
     body: JSON.stringify(payload)
   }).then(r => r.json());
 
+  export const listShares = (token) =>
+  fetch(`${API_BASE}/api/share`, {
+    headers: { Authorization: `Bearer ${token}` }
+  }).then((r) => r.json());
+  
 export const listMyShares = (token) =>
   fetch(`${API_BASE}/api/share`, {
     headers: { Authorization: `Bearer ${token}` }
